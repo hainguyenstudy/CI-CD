@@ -40,14 +40,24 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         port: ${{ secrets.SSH_PORT || '22' }}
         script: |
+          # Load nvm (thay ~/.nvm nếu path khác, nhưng thường là ~/.nvm)
+          export NVM_DIR="$HOME/.nvm"
+          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # Load nvm
+          [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # Optional completion
+        
+          nvm use 24.14.0   # Hoặc nvm use 24 nếu alias default
+        
           cd /home/hai/source/next.js/examples/with-jest
           
           git fetch origin
           git reset --hard origin/main
           
-          /home/hai/.bun/bin/bun install --production
-          /home/hai/.bun/bin/bun run build
+          bun install --production   # Nếu dùng bun, hoặc npm ci --production
+          bun run build              # Hoặc npm run build
           
-          /home/hai/.npm-global/bin/pm2 restart next-jest || /home/hai/.npm-global/bin/pm2 start npm --name "next-jest" -- run start
+          # Restart pm2 (giờ pm2 sẽ tìm thấy vì nvm loaded)
+          pm2 restart ci-cd      # Hoặc tên app của bạn
+          # Nếu vẫn fail, dùng full path:
+          # /home/hai/.nvm/versions/node/v24.14.0/bin/pm2 restart next-jest
           
           echo "Deployment completed successfully!"
