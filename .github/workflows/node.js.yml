@@ -54,7 +54,7 @@ jobs:
           
           # Restart app (tùy cách bạn chạy app: pm2, systemd, docker, ...)
           # Ví dụ nếu dùng pm2:
-          pm2 restart 
+          pm2 restart ci-cd
           
           
           # Hoặc nếu dùng Docker:
