@@ -39,25 +39,15 @@ jobs:
         username: ${{ secrets.SSH_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         port: ${{ secrets.SSH_PORT || '22' }}
-        script: |  # Script chạy trên server sau khi kết nối SSH
-          cd /home/hai/source/next.js/examples/with-jest   # Thay bằng đường dẫn project trên server
+        script: |
+          cd /home/hai/source/next.js/examples/with-jest
           
-          # Pull code mới từ main
           git fetch origin
           git reset --hard origin/main
           
-          # Cài dependencies (nếu dùng npm)
-          bun ci --production   # Hoặc bun install / yarn install nếu dùng
+          /home/hai/.bun/bin/bun install --production
+          /home/hai/.bun/bin/bun run build
           
-          # Build lại nếu cần
-          bun run build
-          
-          # Restart app (tùy cách bạn chạy app: pm2, systemd, docker, ...)
-          # Ví dụ nếu dùng pm2:
-          pm2 restart ci-cd
-          
-          
-          # Hoặc nếu dùng Docker:
-          # docker compose down && docker compose pull && docker compose up -d
+          /home/hai/.npm-global/bin/pm2 restart next-jest || /home/hai/.npm-global/bin/pm2 start npm --name "next-jest" -- run start
           
           echo "Deployment completed successfully!"
